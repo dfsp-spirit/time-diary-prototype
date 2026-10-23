@@ -26,45 +26,90 @@ def day(i): return START + dt.timedelta(days=i)
 def label(d): return f'{d:%a} {d.day} {d:%b}'
 e = html.escape
 
-# The catalogue, as the participant sees it. Categories still to confirm are left out of the prototype.
+# The catalogue, as the participant sees it. Modelled on the real pilot study (7 categories, 61 codes),
+# so the list is as long as it will be in production. Categories still to confirm are left out.
 CATALOGUE = [
-    ('General Activities', [
+    ('General & daily living', [
         ('general.sleeping', 'Sleeping', '', 'general', 'none', []),
-        ('general.adl', 'Activities of Daily Living', 'Eating, drinking, personal care, household routines, caring for children, pets, …', 'general', 'none', []),
         ('general.resting', 'Resting', 'Lunch break, couch time, downtime, …', 'general', 'none', []),
+        ('general.adl', 'Activities of Daily Living', 'Eating, drinking, personal care, household routines, …', 'general', 'none', []),
+        ('general.eating', 'Eating & drinking', '', 'general', 'none', []),
+        ('general.care', 'Personal care & grooming', '', 'general', 'none', []),
     ]),
-    ('Travel & Transit', [
-        ('travel.travelling', 'Travelling', 'Walking, cycle, running, car, public transport, …', 'travel', 'options', [
-            ('walking', 'Travelling: walking'), ('cycle', 'Travelling: cycle'), ('running', 'Travelling: running'),
-            ('private-vehicle', 'Travelling: car, motorbike, moped, E-scooter, taxi or similar'),
-            ('public-transport', 'Travelling: public transport'), ('other', 'Travelling: other')]),
-    ]),
-    ('Other', [
-        ('other.other', 'Other Activity', 'Please specify.', 'other', 'text', []),
-        ('other.forgot', 'Forgot / Unspecified', '', 'other', 'none', []),
-    ]),
-    # Prototype: enough further activities to make the list longer than the screen, so the
-    # scrolling behaviour of the panel is visible instead of assumed.
-    ('Work & Study', [
-        ('work.work', 'Work', 'Main job, self-employment, …', 'work', 'none', []),
-        ('work.study', 'Studying', 'Classes, homework, revision, …', 'work', 'none', []),
+    ('Work & study', [
+        ('work.paid', 'Paid work', 'Main job, self-employment, …', 'work', 'none', []),
+        ('work.school', 'School', '', 'work', 'options', [
+            ('primary', 'School: primary'), ('lower-secondary', 'School: lower secondary'),
+            ('upper-secondary', 'School: upper secondary / Gymnasium')]),
+        ('work.university', 'University', '', 'work', 'options', [
+            ('bachelor', 'University: Bachelor'), ('master', 'University: Master'), ('phd', 'University: PhD')]),
+        ('work.courses', 'Other courses / training', '', 'work', 'none', []),
+        ('work.apprenticeship', 'Apprenticeship / vocational training', '', 'work', 'none', []),
+        ('work.seminar', 'Further education seminar', '', 'work', 'none', []),
+        ('work.homework', 'Homework & studying', '', 'work', 'none', []),
         ('work.meetings', 'Meetings', '', 'work', 'none', []),
         ('work.volunteering', 'Volunteering', '', 'work', 'none', []),
         ('work.jobsearch', 'Job seeking', '', 'work', 'none', []),
     ]),
-    ('Household & Care', [
+    ('Travel & transit', [
+        ('travel.travelling', 'Travelling', 'Walking, cycle, running, car, public transport, …', 'travel', 'options', [
+            ('walking', 'Travelling: walking'), ('cycle', 'Travelling: cycle'), ('running', 'Travelling: running'),
+            ('private-vehicle', 'Travelling: car, motorbike, moped, E-scooter, taxi or similar'),
+            ('public-transport', 'Travelling: public transport'), ('other', 'Travelling: other')]),
+        ('travel.commuting', 'Commuting to work or school', '', 'travel', 'none', []),
+        ('travel.waiting', 'Waiting / transferring', '', 'travel', 'none', []),
+    ]),
+    ('Sport & physical activity', [
+        ('sport.outdoors', 'Sport & exercise (outdoors)', 'Cycling, team sport, running outside, …', 'out', 'none', []),
+        ('sport.gym', 'Sport in a gym or studio', 'Fitness studio, courses, …', 'out', 'none', []),
+        ('sport.indoors', 'Sport indoors', 'Swimming, indoor courses, …', 'out', 'none', []),
+        ('sport.walking', 'Walking for exercise', '', 'out', 'none', []),
+        ('sport.cycling', 'Cycling for exercise', '', 'out', 'none', []),
+        ('sport.team', 'Team sport', '', 'out', 'none', []),
+        ('sport.home', 'Sport & exercise at home', 'Home workout, yoga, …', 'home', 'none', []),
+    ]),
+    ('Household & care', [
         ('home.cooking', 'Cooking & preparing food', '', 'home', 'none', []),
         ('home.cleaning', 'Cleaning & tidying', '', 'home', 'none', []),
         ('home.laundry', 'Laundry & ironing', '', 'home', 'none', []),
         ('home.repairs', 'Repairs & maintenance', '', 'home', 'none', []),
+        ('home.gardening', 'Gardening', '', 'home', 'none', []),
+        ('home.pets', 'Caring for pets', '', 'home', 'none', []),
         ('home.care-children', 'Caring for children', 'Feeding, playing, helping, …', 'home', 'none', []),
         ('home.care-adults', 'Caring for other adults', '', 'home', 'none', []),
+        ('home.activities', 'Activities at home', 'Tidying up, organising, …', 'home', 'none', []),
     ]),
-    ('Leisure & Media', [
-        ('out.socialising', 'Socialising', 'Friends, family, going out, …', 'out', 'none', []),
-        ('digital.streaming', 'Streaming video', '', 'digital', 'none', []),
+    ('Social, leisure & hobbies', [
+        ('out.activities', 'Activities outside home', '', 'out', 'none', []),
+        ('out.socialising', 'Meeting family or friends', 'Visiting, going out together, …', 'out', 'none', []),
+        ('out.religion', 'Religious / spiritual practice, meditation', '', 'out', 'none', []),
+        ('out.reading', 'Reading (paper book, magazine, newspaper)', '', 'out', 'none', []),
+        ('out.hobby', 'Leisure / hobby (please specify)', '', 'out', 'text', []),
+        ('out.culture', 'Cultural activity / event', 'Cinema, theatre, concert, museum, …', 'out', 'none', []),
+        ('out.music', 'Playing or making music', '', 'out', 'none', []),
+        ('out.games', 'Games & puzzles', 'Board games, cards, …', 'out', 'none', []),
+    ]),
+    ('Digital media', [
+        ('digital.streaming', 'Video streaming', 'TV programmes, YouTube, …', 'digital', 'none', []),
+        ('digital.calls', 'Social contact by phone or video call', 'Phone, Zoom, FaceTime, …', 'digital', 'none', []),
         ('digital.social-media', 'Social media', '', 'digital', 'none', []),
-        ('digital.news', 'Reading news online', '', 'digital', 'none', []),
+        ('digital.scrolling', 'Scrolling / consuming content', '', 'digital', 'none', []),
+        ('digital.networking', 'Building networks / engaging with posts', '', 'digital', 'none', []),
+        ('digital.messenger', 'Messenger / chatting', '', 'digital', 'none', []),
+        ('digital.gaming', 'Gaming', '', 'digital', 'options', [
+            ('console-alone', 'Gaming: console, alone'), ('console-together', 'Gaming: console, with others'),
+            ('computer-alone', 'Gaming: computer, alone'), ('computer-together', 'Gaming: computer, with others'),
+            ('mobile-alone', 'Gaming: mobile, alone'), ('mobile-together', 'Gaming: mobile, with others')]),
+        ('digital.audio', 'Listening to audio', 'Music, podcasts, audiobooks, …', 'digital', 'none', []),
+        ('digital.learning', 'Online learning', 'Duolingo, online courses, …', 'digital', 'none', []),
+        ('digital.reading', 'Reading digitally', 'News, e-books, articles, …', 'digital', 'none', []),
+        ('digital.browsing', 'Web browsing / life admin', '', 'digital', 'none', []),
+        ('digital.shopping', 'Online shopping', '', 'digital', 'none', []),
+        ('digital.editing', 'Photo & video editing', '', 'digital', 'none', []),
+    ]),
+    ('Other', [
+        ('other.other', 'Other Activity', 'Please specify.', 'other', 'text', []),
+        ('other.forgot', 'Forgot / Unspecified', '', 'other', 'none', []),
     ]),
 ]
 

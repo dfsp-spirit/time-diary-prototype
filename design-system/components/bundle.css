@@ -50,7 +50,7 @@ html { height: 100%; -webkit-text-size-adjust: 100%; overscroll-behavior-y: none
 /* ---------- Activity list & card ---------- */
 .td-activity-list { display: grid; gap: var(--space-6); margin: 0; padding: 0; }
 .td-activity-group { display: grid; gap: var(--space-2); }
-.td-activity-group > h3 { margin: 0 0 var(--space-1); font-size: 0.875rem; line-height: 1.25rem; font-weight: 600; color: var(--ink-muted); letter-spacing: 0.02em; text-transform: uppercase; }
+.td-activity-group > h3 { position: sticky; top: calc(-1 * var(--space-5)); z-index: 1; margin: 0 0 var(--space-1); padding: var(--space-2) 0; background: var(--bg); font-size: 0.875rem; line-height: 1.25rem; font-weight: 600; color: var(--ink-muted); letter-spacing: 0.02em; text-transform: uppercase; }
 .td-activity-group > ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
 .td-activity { display: flex; align-items: center; gap: var(--space-3); width: 100%; min-height: 64px; padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4); border: 0; border-radius: var(--radius-md); background: var(--surface-100); color: var(--ink); text-align: start; cursor: pointer; }
 .td-activity:active { background: var(--surface-300); }
