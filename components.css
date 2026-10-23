@@ -211,7 +211,7 @@ html:has(dialog[open]) { overflow: hidden; }
 /* No floating button on screen (menu pages, a locked diary): the toast sits at the bottom */
 .td-fab[hidden] ~ .td-toast[popover] { bottom: max(var(--space-4), env(safe-area-inset-bottom)); }
 /* Add activity open: above its two stacked buttons */
-.td-modal[open]:has(> form > .td-modal__foot:not([hidden])) ~ .td-toast[popover] { bottom: calc(var(--space-3) + 2 * var(--tap-min) + var(--space-2) + max(var(--space-3), env(safe-area-inset-bottom)) + 1px + var(--space-3)); }
+html:has(.td-modal[open] > form > .td-modal__foot:not([hidden])) .td-toast[popover] { bottom: calc(var(--space-3) + 2 * var(--tap-min) + var(--space-2) + max(var(--space-3), env(safe-area-inset-bottom)) + 1px + var(--space-3)); }
 
 /* ---------- Save status ---------- */
 .td-save { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 32px; padding: 0 var(--space-3); border: 1.5px solid var(--line-strong); border-radius: var(--radius-pill); font-size: 0.875rem; line-height: 1.25rem; font-weight: 600; color: var(--ink); background: var(--bg); }

@@ -4,7 +4,7 @@ import datetime as dt, html, sys
 
 OUT = sys.argv[1]
 START = dt.date(2026, 10, 19)
-DAYS = 14
+DAYS = 7
 TODAY_I = 1   # simulated "today" = Tue 20 Oct
 
 ICON = {
@@ -84,6 +84,13 @@ days_html = ''.join(f'''
       </div>
     </section>''' for i in range(DAYS))
 
+rail_html = ''.join(
+    f'<li><a class="td-rail__row" href="#day-{day(i).isoformat()}">'
+    f'<span class="td-rail__day">{label(day(i))}</span>'
+    f'<span class="td-rail__min" data-min>–</span>'
+    f'<span class="td-rail__bar"><span class="td-rail__fill"></span></span>'
+    f'</a></li>' for i in range(DAYS))
+
 end = day(DAYS - 1)
 page = f'''<!doctype html>
 <html lang="en">
@@ -100,6 +107,61 @@ page = f'''<!doctype html>
   :root {{ --topbar-h: calc(121px + env(safe-area-inset-top)); }}
   html {{ scroll-padding-top: var(--topbar-h); }}
   .td-app {{ max-width: var(--content-max); margin: 0 auto; }}
+
+  /* Desktop shell (prototype only). Layout, not component styling: the phone layout above stays
+     exactly as it is, and everything here is additive behind the 1200px query. */
+  .td-topbar__note, .td-rail, .td-dock__idle {{ display: none; }}
+  @media (min-width: 1200px) {{
+    .td-app {{ max-width: 1360px; margin: 0 auto; display: grid; padding-top: var(--topbar-h);
+      grid-template-columns: 260px minmax(0, 1fr) 380px; align-items: start; }}
+    /* Header spans the shell and stays put. Fixed rather than sticky, as on phones: one paint path,
+       no dependence on how a browser constrains sticky grid items. */
+    .td-topbar {{ position: fixed; inset-inline: 0; margin-inline: auto; max-width: 1360px; }}
+    .td-topbar__note {{ display: block; margin: 0; font-size: 0.875rem; line-height: 1.25rem;
+      color: var(--ink-muted); white-space: nowrap; }}
+    .td-daynav {{ display: none; }}
+    .td-topbar ~ .td-timeline {{ padding-top: 0; }}
+
+    .td-rail {{ display: block; grid-column: 1; grid-row: 2; position: sticky; top: var(--topbar-h);
+      height: calc(100dvh - var(--topbar-h)); overflow: auto;
+      padding: var(--space-4) var(--space-3) var(--space-6) var(--space-4);
+      border-inline-end: 1px solid var(--line); }}
+    .td-rail__title {{ margin: 0 0 var(--space-2); font-size: 0.75rem; line-height: 1rem; font-weight: 500;
+      color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; }}
+    .td-rail__list {{ list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-1); }}
+    .td-rail__row {{ display: grid; grid-template-columns: 1fr auto; gap: var(--space-1) var(--space-2);
+      padding: var(--space-2) var(--space-3); border: 1.5px solid transparent; border-radius: var(--radius-md);
+      color: var(--ink); text-decoration: none; }}
+    .td-rail__row:hover {{ background: var(--surface-100); }}
+    .td-rail__row:focus-visible {{ outline: 3px solid var(--focus); outline-offset: 2px; }}
+    .td-rail__row[aria-current="true"] {{ border-color: var(--ink); }}
+    .td-rail__day {{ font-weight: 600; }}
+    .td-rail__min {{ font-family: var(--font-mono); font-size: 0.8125rem; color: var(--ink-muted); }}
+    .td-rail__bar {{ grid-column: 1 / -1; display: block; height: 6px; border-radius: var(--radius-pill);
+      background: var(--surface-200); overflow: hidden; }}
+    .td-rail__fill {{ display: block; height: 100%; width: var(--fill, 0); background: var(--ink); }}
+    .td-rail__note {{ margin: var(--space-4) 0 0; font-size: 0.75rem; line-height: 1.125rem;
+      color: var(--ink-muted); }}
+
+    /* The timeline is the only long column; its day heading sticks under the header so the day
+       you are in stays named while you scroll. */
+    .td-timeline {{ grid-column: 2; grid-row: 2; padding-bottom: var(--space-8); }}
+    .td-tl-day__head {{ position: sticky; top: var(--topbar-h); z-index: 1; }}
+
+    /* The Add activity dialog docks into the third column instead of covering the calendar. */
+    .td-dock__idle {{ grid-column: 3; grid-row: 2; position: sticky; top: var(--topbar-h);
+      height: calc(100dvh - var(--topbar-h)); display: grid; align-content: start; gap: var(--space-3);
+      padding: var(--space-5) var(--space-4); border-inline-start: 1px solid var(--line); }}
+    .td-dock__idle p {{ margin: 0; }}
+    .td-dock__idle-text {{ font-size: 0.875rem; line-height: 1.375rem; color: var(--ink-muted); }}
+    .td-dock__idle:has(+ #add[open]) {{ display: none; }}
+    #add {{ grid-column: 3; grid-row: 2; position: sticky; top: var(--topbar-h);
+      height: calc(100dvh - var(--topbar-h)); max-height: none;
+      border-inline-start: 1px solid var(--line); }}
+    /* A docked panel is not modal, so the page behind it keeps scrolling. */
+    html:has(#add[open]) {{ overflow: auto; }}
+    #fab {{ display: none; }}
+  }}
 </style>
 </head>
 <body>
@@ -108,6 +170,7 @@ page = f'''<!doctype html>
     <div class="td-topbar__row">
       <button class="td-icon-btn" type="button" popovertarget="menu" aria-label="Menu">{icon('menu')}</button>
       <div class="td-topbar__title"><h1 class="td-topbar__name">Time Diary</h1></div>
+      <p class="td-topbar__note">Desktop layout prototype · {DAYS} days · sample data</p>
       <button class="td-btn td-btn--secondary td-btn--sm" type="button" id="submit-btn" aria-disabled="true" popovertarget="submit-why">{icon('lock')} Submit</button>
     </div>
     <nav class="td-daynav" aria-label="Day">
@@ -120,6 +183,12 @@ page = f'''<!doctype html>
     </nav>
   </header>
 
+  <aside class="td-rail" aria-label="Days and coverage">
+    <h2 class="td-rail__title">Days</h2>
+    <ol class="td-rail__list">{rail_html}</ol>
+    <p class="td-rail__note">Placeholder panel. The minutes and bars are the real coverage; what is still open is
+      what belongs here besides the days (submission state, the submit button).</p>
+  </aside>
   <main class="td-timeline" id="timeline">
     <div class="td-notice td-timeline__notice" id="empty-note" role="status" hidden>
       <svg class="td-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
@@ -134,6 +203,75 @@ page = f'''<!doctype html>
     </div>
     <div id="days"></div>
   </main>
+<div class="td-dock__idle">
+  <p class="td-dock__idle-title">Activity list</p>
+  <p class="td-dock__idle-text">The activities appear here, in the same column as the form, so the calendar stays in
+    view while you add something.</p>
+  <button class="td-btn td-btn--primary" type="button" id="dock-add">Add activity</button>
+</div>
+<dialog class="td-modal" id="add" aria-labelledby="add-title">
+  <form id="add-form" method="post" action="#" novalidate>
+    <div class="td-modal__head">
+      <button class="td-icon-btn" type="button" id="add-back" aria-label="Back to activities" hidden>{icon('prev')}</button>
+      <h2 id="add-title" tabindex="-1"><span class="td-modal__step" id="add-step">Step 1 of 2</span><span class="td-vh">: </span><span id="add-heading">Add activity</span></h2>
+      <span class="td-modal__count" id="add-count" hidden></span>
+      <button class="td-icon-btn" type="button" id="add-close" aria-label="Close">{icon('close')}</button>
+    </div>
+
+    <div class="td-modal__body" id="step-1">
+      <div class="td-activity-list">
+        <section class="td-activity-group" id="recent-group" aria-labelledby="g-recent" hidden>
+          <h3 id="g-recent">Used recently</h3>
+          <ul id="recent-list"></ul>
+        </section>
+        {groups}
+      </div>
+    </div>
+
+    <div class="td-modal__body" id="step-2" hidden>
+      <div class="td-chosen"><span class="td-pat" id="chosen-pat" aria-hidden="true"></span><span class="td-chosen__text" id="chosen-text"></span></div>
+      {option_sets}
+      <div class="td-field" id="note-field" hidden>
+        <label for="note">What did you do?</label>
+        <input class="td-input" id="note" name="note" maxlength="200" autocomplete="off">
+      </div>
+      <fieldset class="td-time-range">
+        <legend>When?</legend>
+        <div class="td-field"><label for="f-day">Day</label><select class="td-select td-select--text" id="f-day" name="day"></select></div>
+        <div class="td-time-range__row">
+          <div class="td-field"><label for="f-start">Start</label><select class="td-select" id="f-start" name="start">{start_options}</select></div>
+          <div class="td-field"><label for="f-end">End</label><select class="td-select" id="f-end" name="end" aria-describedby="end-hint"></select></div>
+        </div>
+        <p class="td-duration">Lasts <output id="f-dur" for="f-start f-end"></output></p>
+        <p class="td-hint" id="end-hint" hidden></p>
+      </fieldset>
+      <fieldset class="td-days" id="f-days-set" aria-describedby="days-hint">
+        <legend>Also on other days?</legend>
+        <p class="td-hint" id="days-hint">Same activity and time. Tap the days that were the same.</p>
+        <div class="td-days__grid" id="f-chips"></div>
+      </fieldset>
+      <div class="td-notice td-notice--attention" id="add-error" tabindex="-1" hidden>
+        <div class="td-notice__body"><p class="td-notice__title" id="add-error-title"></p><p id="add-error-text"></p></div>
+      </div>
+    </div>
+
+    <div class="td-modal__foot" id="add-foot" hidden>
+      <button class="td-btn td-btn--primary td-btn--block" type="submit" name="then" value="close" id="add-btn">Add to timeline</button>
+      <button class="td-btn td-btn--secondary td-btn--block" type="submit" name="then" value="next" id="next-btn">Save and add another</button>
+      <button class="td-btn td-btn--primary td-btn--block" type="submit" name="then" value="save" id="save-btn" hidden>Save changes</button>
+      <button class="td-btn td-btn--secondary td-btn--block" type="button" id="delete-btn" hidden>Delete activity</button>
+    </div>
+  </form>
+
+  <div popover id="discard" class="td-popover td-popover--sheet" role="alertdialog" aria-labelledby="discard-title" aria-describedby="discard-text">
+    <h2 id="discard-title">Discard this activity?</h2>
+    <p id="discard-text">It hasn't been added to your timeline yet.</p>
+    <div class="td-popover__stack">
+      <button class="td-btn td-btn--primary td-btn--block" type="button" id="keep-editing" autofocus>Keep editing</button>
+      <button class="td-btn td-btn--secondary td-btn--block" type="button" id="discard-go">Discard</button>
+    </div>
+  </div>
+</dialog>
 </div>
 
 
@@ -240,71 +378,6 @@ page = f'''<!doctype html>
     <li><button class="td-drawer__item" type="button" id="reset-data">Reset to sample data <span class="td-drawer__meta">prototype</span></button></li>
   </ul>
 </nav>
-
-<dialog class="td-modal" id="add" aria-labelledby="add-title">
-  <form id="add-form" method="post" action="#" novalidate>
-    <div class="td-modal__head">
-      <button class="td-icon-btn" type="button" id="add-back" aria-label="Back to activities" hidden>{icon('prev')}</button>
-      <h2 id="add-title" tabindex="-1"><span class="td-modal__step" id="add-step">Step 1 of 2</span><span class="td-vh">: </span><span id="add-heading">Add activity</span></h2>
-      <span class="td-modal__count" id="add-count" hidden></span>
-      <button class="td-icon-btn" type="button" id="add-close" aria-label="Close">{icon('close')}</button>
-    </div>
-
-    <div class="td-modal__body" id="step-1">
-      <div class="td-activity-list">
-        <section class="td-activity-group" id="recent-group" aria-labelledby="g-recent" hidden>
-          <h3 id="g-recent">Used recently</h3>
-          <ul id="recent-list"></ul>
-        </section>
-        {groups}
-      </div>
-    </div>
-
-    <div class="td-modal__body" id="step-2" hidden>
-      <div class="td-chosen"><span class="td-pat" id="chosen-pat" aria-hidden="true"></span><span class="td-chosen__text" id="chosen-text"></span></div>
-      {option_sets}
-      <div class="td-field" id="note-field" hidden>
-        <label for="note">What did you do?</label>
-        <input class="td-input" id="note" name="note" maxlength="200" autocomplete="off">
-      </div>
-      <fieldset class="td-time-range">
-        <legend>When?</legend>
-        <div class="td-field"><label for="f-day">Day</label><select class="td-select td-select--text" id="f-day" name="day"></select></div>
-        <div class="td-time-range__row">
-          <div class="td-field"><label for="f-start">Start</label><select class="td-select" id="f-start" name="start">{start_options}</select></div>
-          <div class="td-field"><label for="f-end">End</label><select class="td-select" id="f-end" name="end" aria-describedby="end-hint"></select></div>
-        </div>
-        <p class="td-duration">Lasts <output id="f-dur" for="f-start f-end"></output></p>
-        <p class="td-hint" id="end-hint" hidden></p>
-      </fieldset>
-      <fieldset class="td-days" id="f-days-set" aria-describedby="days-hint">
-        <legend>Also on other days?</legend>
-        <p class="td-hint" id="days-hint">Same activity and time. Tap the days that were the same.</p>
-        <div class="td-days__grid" id="f-chips"></div>
-      </fieldset>
-      <div class="td-notice td-notice--attention" id="add-error" tabindex="-1" hidden>
-        <div class="td-notice__body"><p class="td-notice__title" id="add-error-title"></p><p id="add-error-text"></p></div>
-      </div>
-    </div>
-
-    <div class="td-modal__foot" id="add-foot" hidden>
-      <button class="td-btn td-btn--primary td-btn--block" type="submit" name="then" value="close" id="add-btn">Add to timeline</button>
-      <button class="td-btn td-btn--secondary td-btn--block" type="submit" name="then" value="next" id="next-btn">Save and add another</button>
-      <button class="td-btn td-btn--primary td-btn--block" type="submit" name="then" value="save" id="save-btn" hidden>Save changes</button>
-      <button class="td-btn td-btn--secondary td-btn--block" type="button" id="delete-btn" hidden>Delete activity</button>
-    </div>
-  </form>
-
-  <div popover id="discard" class="td-popover td-popover--sheet" role="alertdialog" aria-labelledby="discard-title" aria-describedby="discard-text">
-    <h2 id="discard-title">Discard this activity?</h2>
-    <p id="discard-text">It hasn't been added to your timeline yet.</p>
-    <div class="td-popover__stack">
-      <button class="td-btn td-btn--primary td-btn--block" type="button" id="keep-editing" autofocus>Keep editing</button>
-      <button class="td-btn td-btn--secondary td-btn--block" type="button" id="discard-go">Discard</button>
-    </div>
-  </div>
-</dialog>
-
 <dialog class="td-modal" id="review" aria-labelledby="review-title">
   <form id="review-form" method="post" action="#" novalidate>
     <div class="td-modal__head">

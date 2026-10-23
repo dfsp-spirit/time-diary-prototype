@@ -6,7 +6,7 @@
   var Q = 96;                 // quarter hours in a day
   var LIMIT = 3;              // most activities allowed at the same moment
   var NOW_Q = 58;             // prototype clock time: 14:30
-  var DIARY_DAYS = 14;
+  var DIARY_DAYS = 7;
   var CATALOGUE_VERSION = '2026-10-17';
   var FIRST_TODAY = '2026-10-20';   // prototype "today" until skipped ahead
 
@@ -27,6 +27,12 @@
   var rangeOf = function (d) { return shortDate(d.start) + ' – ' + shortDate(addDays(d.start, d.days - 1)); };
 
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+
+  /* Desktop docks the Add activity panel into the third column instead of covering the calendar, so there it
+     must open non-modal. Below 1200px it stays a full-screen modal dialog, exactly as before. */
+  var WIDE = window.matchMedia('(min-width: 1200px)');
+  function openPanel(d) { if (d.open) return; if (WIDE.matches) d.show(); else d.showModal(); }
+
   function svg(path) {
     var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     s.setAttribute('class', 'td-icon'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('aria-hidden', 'true');
@@ -125,8 +131,8 @@
   var SIMPLE_DAY = [[0, 28, 'general.sleeping', 'Sleeping', 'general', null], [28, 32, 'general.adl', 'Activities of Daily Living', 'general', null], [32, 34, 'travel.travelling.walking', 'Travelling: walking', 'travel', 'travel.travelling']];
   function activity(diaryId, day, a) { var id = uid(); return record({ id: id, group: id, diaryId: diaryId, day: day, start: a[0], end: a[1], activityId: a[2], label: a[3], pattern: a[4], parent: a[5] || null, note: '', sample: true }); }
   function seed() {
-    var d1 = { id: 'd1', number: 1, start: '2026-09-21', days: DIARY_DAYS, status: 'submitted', submittedOn: '2026-10-04', ref: 'K7PD-2M' };
-    var d2 = { id: 'd2', number: 2, start: '2026-10-05', days: DIARY_DAYS, status: 'submitted', submittedOn: '2026-10-18', ref: 'W3RT-9X' };
+    var d1 = { id: 'd1', number: 1, start: '2026-10-05', days: DIARY_DAYS, status: 'submitted', submittedOn: '2026-10-12', ref: 'K7PD-2M' };
+    var d2 = { id: 'd2', number: 2, start: '2026-10-12', days: DIARY_DAYS, status: 'submitted', submittedOn: '2026-10-19', ref: 'W3RT-9X' };
     var d3 = { id: 'd3', number: 3, start: '2026-10-19', days: DIARY_DAYS, status: 'open' };
     var recs = [];
     [d1, d2].forEach(function (d) { for (var i = 0; i < d.days; i++) SIMPLE_DAY.forEach(function (a) { recs.push(activity(d.id, i, a)); }); });
@@ -181,6 +187,19 @@
     return segs;
   }
 
+  /* Covered time for a day as a union of intervals, in quarter hours — the same rule the real app uses.
+     Overlapping activities count once, so three parallel activities never sum past 24 h. */
+  function coverageFor(d, i) {
+    var iv = segmentsFor(d, i).map(function (s) { return [s.s, s.en]; }).sort(function (a, b) { return a[0] - b[0]; });
+    var total = 0, from = -1, to = -1;
+    iv.forEach(function (r) {
+      if (r[0] > to) { if (to > from) total += to - from; from = r[0]; to = r[1]; }
+      else if (r[1] > to) to = r[1];
+    });
+    if (to > from) total += to - from;
+    return total;
+  }
+
   function eventItem(sg, i) {
     var e = sg.e, dur = sg.en - sg.s, li = el('li', 'td-event'), short = dur <= 3;
     if (short) li.classList.add('td-event--short');
@@ -225,6 +244,19 @@
     if (fresh) $('empty-text').replaceChildren(el('strong', null, 'Diary ' + d.number + ' has started.'), ' Tap Add activity to fill in your day.');
     $('fab').hidden = readOnly() || view !== 'timeline';
     updateMenu();
+    updateRail();
+  }
+
+  /* Desktop day rail: real coverage per day, and the day currently under the header is marked. */
+  function updateRail() {
+    var rows = document.querySelectorAll('.td-rail__row');
+    if (!rows.length || !viewing) return;
+    Array.prototype.forEach.call(rows, function (row, i) {
+      var q = i < viewing.days ? coverageFor(viewing, i) : 0, mins = q * 15;
+      row.querySelector('[data-min]').textContent = q ? mins + ' min' : 'empty';
+      row.parentNode.style.setProperty('--fill', Math.min(100, mins / 14.4) + '%');
+      if (i === current) row.setAttribute('aria-current', 'true'); else row.removeAttribute('aria-current');
+    });
   }
 
   function updateReadOnlyNote() {
@@ -275,6 +307,7 @@
     prev.inert = i === 0; next.inert = i === n - 1;
     if (i > 0) { prev.href = '#' + dayEls[i - 1].id; prev.setAttribute('aria-label', 'Previous day, ' + dayLabel(i - 1)); }
     if (i < n - 1) { next.href = '#' + dayEls[i + 1].id; next.setAttribute('aria-label', 'Next day, ' + dayLabel(i + 1)); }
+    updateRail();
   }
   /* Previous / next day: one instant scroll, no hash jump. A hash jump scrolled twice (browser, then route) and
      repainted the sticky bar on phones; replaceState also keeps Back from stepping through every day. */
@@ -434,7 +467,7 @@
   function openAdd(p) {
     mode = 'add'; editing = null; prefill = p; addedInRun = 0; $('add-count').hidden = true;
     form.reset(); fillDayControls(); renderRecents(); showStep(1);
-    if (!dlg.open) dlg.showModal();
+    openPanel(dlg);
     $('add-title').focus();
   }
   function openEdit(id) {
@@ -442,7 +475,7 @@
     mode = 'edit'; editing = r; addedInRun = 0; $('add-count').hidden = true;
     prefill = { day: r.day, start: r.start, end: r.end };
     form.reset(); fillDayControls(); renderRecents();
-    if (!dlg.open) dlg.showModal();
+    openPanel(dlg);
     choose(catalogueButton(r.parent || r.activityId), { option: r.parent ? r.activityId : null, note: r.note });
   }
 
@@ -588,7 +621,7 @@
     if (d.mode === 'edit') { var r = byId(d.editId); if (!r || r.removedAt) { clearDraft(); return; } mode = 'edit'; editing = r; }
     else { mode = 'add'; editing = null; }
     prefill = { day: d.day, start: d.start, end: d.end };
-    form.reset(); fillDayControls(); renderRecents(); dlg.showModal();
+    form.reset(); fillDayControls(); renderRecents(); openPanel(dlg);
     choose(catalogueButton(d.activityId), { option: d.option, note: d.note, days: d.days });
     toast('Your unfinished activity is back where you left it.');
   }
@@ -599,7 +632,12 @@
   dlg.addEventListener('cancel', function (ev) { if (step === 2) { ev.preventDefault(); $('discard').showPopover(); } });
   $('keep-editing').addEventListener('click', function () { $('discard').hidePopover(); });
   $('discard-go').addEventListener('click', function () { $('discard').hidePopover(); clearDraft(); dlg.close(); });
-  dlg.addEventListener('close', function () { step = 1; $('fab').focus({ preventScroll: true }); });
+  /* Focus goes back to whatever opened the panel: the dock button on desktop, the floating one on phones. */
+  dlg.addEventListener('close', function () {
+    step = 1;
+    var a = $('dock-add'), t = $('fab');
+    (a && a.offsetParent !== null ? a : t).focus({ preventScroll: true });
+  });
   $('add-back').addEventListener('click', function () { showStep(1); $('add-title').focus(); });
   $('step-1').addEventListener('click', function (ev) {
     var b = ev.target.closest('.td-activity'); if (!b) return;
@@ -611,6 +649,9 @@
   fEnd.addEventListener('change', showDuration);
 
   $('fab').addEventListener('click', function () { openAdd(timeInView()); });
+  /* Desktop hides the floating button; the docked panel's own button opens the same flow. */
+  var dockAdd = $('dock-add');
+  if (dockAdd) dockAdd.addEventListener('click', function () { openAdd(timeInView()); });
   $('timeline').addEventListener('click', function (ev) {
     var g = ev.target.closest('.td-gap__btn');
     if (g) return openAdd({ day: +g.dataset.day, start: +g.dataset.start, end: +g.dataset.end });
@@ -774,7 +815,7 @@
     $('menu').hidePopover();
     var s = seed();
     Promise.all(['activities', 'drafts', 'meta', 'diaries'].map(function (n) { return store.clear(n); }))
-      .then(function () { return Promise.all([store.put('activities', s.entries), store.put('diaries', s.diaries), store.put('meta', [{ id: 'seeded-v2', at: nowIso() }])]); })
+      .then(function () { return Promise.all([store.put('activities', s.entries), store.put('diaries', s.diaries), store.put('meta', [{ id: 'seeded-v3', at: nowIso() }])]); })
       .then(function () {
         diaries = s.diaries; entries = s.entries; today = FIRST_TODAY; viewing = null; dayEls = [];
         location.hash = '#timeline'; home(); toast('Back to the sample data.');
@@ -790,11 +831,11 @@
   window.addEventListener('scroll', updateDayNav, { passive: true });
 
   function load() {
-    return store.get('meta', 'seeded-v2').then(function (m) {
+    return store.get('meta', 'seeded-v3').then(function (m) {
       if (m) return Promise.all([store.all('diaries'), store.all('activities'), store.get('meta', 'clock')]).then(function (r) { return { diaries: r[0], entries: r[1], clock: r[2] }; });
       var s = seed();
       return Promise.all(['activities', 'drafts', 'diaries'].map(function (n) { return store.clear(n); }))
-        .then(function () { return Promise.all([store.put('activities', s.entries), store.put('diaries', s.diaries), store.put('meta', [{ id: 'seeded-v2', at: nowIso() }])]); })
+        .then(function () { return Promise.all([store.put('activities', s.entries), store.put('diaries', s.diaries), store.put('meta', [{ id: 'seeded-v3', at: nowIso() }])]); })
         .then(function () { return s; });
     });
   }

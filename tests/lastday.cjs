@@ -13,13 +13,14 @@ const { chromium } = require(process.env.PW || 'playwright');
   const endInfo = () => p.evaluate(() => { const e = document.getElementById('f-end'); return { groups: [...e.querySelectorAll('optgroup')].map(g => g.label + ':' + g.children.length), last: e.options[e.options.length - 1].text, value: e.value, hint: document.getElementById('end-hint').hidden ? null : document.getElementById('end-hint').textContent }; });
   // normal day, 22:30
   await p.selectOption('#f-start', '90'); out.normalDay = await endInfo();
-  // last day
-  await p.selectOption('#f-day', '13'); out.lastDay = await endInfo();
+  // last day of the diary (length comes from DIARY_DAYS, so read it from the control)
+  const lastDay = await p.evaluate(() => document.getElementById('f-day').options.length - 1);
+  await p.selectOption('#f-day', String(lastDay)); out.lastDay = await endInfo();
   await p.evaluate(() => document.getElementById('end-hint').scrollIntoView({ block: 'center' })); await p.waitForTimeout(150);
   await p.screenshot({ path: `${S}/shots/lastday-${scheme}.png` });
-  // back to day 13 of 14 (index 12), overnight to 07:00 (+1), also tick the last day
-  await p.selectOption('#f-day', '12'); await p.selectOption('#f-start', '90'); await p.selectOption('#f-end', '124');
-  await p.locator('input[name="days"][value="13"]').check({ force: true });
+  // back to the day before the last, overnight to 07:00 (+1), also tick the last day
+  await p.selectOption('#f-day', String(lastDay - 1)); await p.selectOption('#f-start', '90'); await p.selectOption('#f-end', '124');
+  await p.locator(`input[name="days"][value="${lastDay}"]`).check({ force: true });
   await p.click('#add-btn'); await p.waitForTimeout(500);
   out.toast = await p.textContent('#toast-text');
   out.errs = errs; console.log(JSON.stringify(out, null, 1)); await b.close();
