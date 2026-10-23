@@ -43,6 +43,29 @@ CATALOGUE = [
         ('other.other', 'Other Activity', 'Please specify.', 'other', 'text', []),
         ('other.forgot', 'Forgot / Unspecified', '', 'other', 'none', []),
     ]),
+    # Prototype: enough further activities to make the list longer than the screen, so the
+    # scrolling behaviour of the panel is visible instead of assumed.
+    ('Work & Study', [
+        ('work.work', 'Work', 'Main job, self-employment, …', 'work', 'none', []),
+        ('work.study', 'Studying', 'Classes, homework, revision, …', 'work', 'none', []),
+        ('work.meetings', 'Meetings', '', 'work', 'none', []),
+        ('work.volunteering', 'Volunteering', '', 'work', 'none', []),
+        ('work.jobsearch', 'Job seeking', '', 'work', 'none', []),
+    ]),
+    ('Household & Care', [
+        ('home.cooking', 'Cooking & preparing food', '', 'home', 'none', []),
+        ('home.cleaning', 'Cleaning & tidying', '', 'home', 'none', []),
+        ('home.laundry', 'Laundry & ironing', '', 'home', 'none', []),
+        ('home.repairs', 'Repairs & maintenance', '', 'home', 'none', []),
+        ('home.care-children', 'Caring for children', 'Feeding, playing, helping, …', 'home', 'none', []),
+        ('home.care-adults', 'Caring for other adults', '', 'home', 'none', []),
+    ]),
+    ('Leisure & Media', [
+        ('out.socialising', 'Socialising', 'Friends, family, going out, …', 'out', 'none', []),
+        ('digital.streaming', 'Streaming video', '', 'digital', 'none', []),
+        ('digital.social-media', 'Social media', '', 'digital', 'none', []),
+        ('digital.news', 'Reading news online', '', 'digital', 'none', []),
+    ]),
 ]
 
 def activity_button(a):
