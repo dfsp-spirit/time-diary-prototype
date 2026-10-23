@@ -93,6 +93,6 @@ A small set of inline SVG icons, 24px, 2px stroke, round caps and joins, `stroke
 ## Sections
 
 - **Activity catalogue** — the categories, activities and sub-activities from the reference screens, with empty placeholders for the research team.
-- **Screens & flows** — timeline, add activity, review, submit, past diaries.
+- **Screens & flows** — timeline, add activity, review, submit.
 - **Protecting participant data** — storage, autosave, submission and locking.
 - **Accessibility** — the rules every screen meets.

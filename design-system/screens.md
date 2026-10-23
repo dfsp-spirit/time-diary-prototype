@@ -27,11 +27,11 @@ If a slot would hold a fourth overlapping activity, *Add to timeline* explains t
 - *Yes, submit* locks the diary at once. Online, it is sent and **Thank you** follows. Offline, the timeline shows "**Waiting to send.** Your diary is locked and safe on this phone. When you're back online, tap Submit to send it." Nothing is sent without the participant: back online, the notice becomes "**Ready to send.** You're back online. Tap Submit to check and send your diary." *Submit* opens Review again (without *Edit* links, since the diary is locked), then the confirm step.
 - **Thank you**: confirms the receipt, says when the next diary opens, and has *Start next diary*.
 
-## Next diary and past diaries
+## After submission
 
-- After submission the diary becomes **read only** and moves to *Past diaries* straight away, with the notice "Diary 3 · Submitted on Tue 20 Oct. You can look, but not change it."
-- **Waiting screen.** Until the next diary opens, home is a calm screen instead of the old timeline: "Your next diary starts on Mon 2 Nov", "In 13 days", and *See the diary you sent*. No *Add activity*, no *Submit*. The menu's *Current diary* reads "starts 2 Nov".
+- After submission the diary becomes **read only**, with the notice "Diary 3 · Submitted on Tue 20 Oct. You can look, but not change it."
+- **Waiting screen.** Home is a calm screen instead of the timeline: "Your next study period starts on Mon 2 Nov" and "In 13 days". No *Add activity*, no *Submit*.
 
 ## Menu (drawer)
 
-Actions above the divider: *Go to today*, *How to add an activity*. Links below it: *Current diary*, *Past diaries*, *Study information*, *Data protection*, *Contact*.
+Actions above the divider: *Go to today*, *How to add an activity*. Links below it: *Study information*, *Data protection*, *Contact*.

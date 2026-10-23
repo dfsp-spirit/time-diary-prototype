@@ -1,4 +1,4 @@
-/* Time Diary prototype — diaries, timeline, Add / Edit activity, submit, past diaries and pages.
+/* Time Diary prototype — diary, timeline, Add / Edit activity, submit and pages.
    Saved on the phone with IndexedDB. Rule: store first, confirm second. */
 (function () {
   'use strict';
@@ -96,14 +96,13 @@
   var entries = [];        // every activity record, removed ones included (so Undo always works)
   var today = FIRST_TODAY; // prototype clock
   var viewing = null;      // the diary shown on the timeline
-  var view = 'timeline';   // timeline | past | help | study | privacy | contact
+  var view = 'timeline';   // timeline | help | study | privacy | contact
 
   var live = function (d) { return entries.filter(function (e) { return !e.removedAt && (!d || e.diaryId === d.id); }); };
   var byId = function (id) { return entries.find(function (e) { return e.id === id; }); };
   var sorted = function () { return diaries.slice().sort(function (a, b) { return a.number - b.number; }); };
   var currentDiary = function () { var c = null; sorted().forEach(function (d) { if (d.start <= today) c = d; }); return c || sorted()[0]; };
   var nextStart = function () { var c = currentDiary(); return addDays(c.start, c.days); };
-  var pastDiaries = function () { return sorted().filter(function (d) { return d.status === 'submitted'; }).reverse(); };
   /* sent and received, and the next diary hasn't started yet */
   var isWaiting = function () { var c = currentDiary(); return c.status === 'submitted' && nextStart() > today; };
   var readOnly = function () { return !!viewing && (viewing.status === 'submitted' || viewing.status === 'pending'); };  /* pending = locked, waiting to send */
@@ -267,10 +266,8 @@
     if (d.status === 'pending') {
       if (online()) txt.append(el('strong', null, 'Ready to send.'), ' You\u2019re back online. Tap Submit to check and send your diary.');
       else txt.append(el('strong', null, 'Waiting to send.'), ' Your diary is locked and safe on this phone. When you\u2019re back online, tap Submit to send it.');
-      $('readonly-back').hidden = true;
     } else {
       txt.append(el('strong', null, 'Diary ' + d.number + ' \u00b7 Submitted on ' + dayName(d.submittedOn) + '.'), ' You can look, but not change it.');
-      $('readonly-back').hidden = false;
     }
   }
 
@@ -341,9 +338,9 @@
   }
 
   /* ======================================================================
-     Views: timeline (current or a past diary) and the menu's pages
+     Views: the timeline and the menu's pages
      ====================================================================== */
-  var PAGES = ['waiting', 'past', 'help', 'study', 'privacy', 'contact'];
+  var PAGES = ['waiting', 'help', 'study', 'privacy', 'contact'];
   /* Home is the current diary, or the waiting screen between diaries */
   function home() { return isWaiting() ? show('waiting') : show('timeline', currentDiary()); }
   function show(name, diary) {
@@ -360,7 +357,6 @@
       if (!wasTimeline || viewing !== prevDiary || readOnly()) { setBar(); if (!location.hash.startsWith('#day-')) { if (readOnly() || !live(viewing).length) window.scrollTo(0, 0); else scrollToToday(); } }
       updateDayNav();
     } else {
-      if (name === 'past') renderPast();
       if (name === 'waiting') renderWaiting();
       window.scrollTo(0, 0);
       $('pt-' + name).focus({ preventScroll: true });
@@ -373,8 +369,6 @@
     var h = location.hash.slice(1);
     if (h === 'waiting') return home();
     if (PAGES.indexOf(h) >= 0) return show(h);
-    var m = /^past-(d\d+)$/.exec(h);
-    if (m) { var d = diaries.find(function (x) { return x.id === m[1]; }); if (d) return show('timeline', d); }
     if (h.indexOf('day-') === 0) {
       if (!dayEls.length && isWaiting()) return home();
       if (view !== 'timeline' || !dayEls.length) show('timeline', viewing || currentDiary());   /* first load or a refresh on a day */
@@ -389,30 +383,14 @@
     var c = currentDiary(), n = daysBetween(today, nextStart());
     $('wait-date').textContent = dayName(nextStart());
     $('wait-days').textContent = n === 1 ? 'Tomorrow' : 'In ' + n + ' days';
-    $('wait-sent').href = '#past-' + c.id;
   }
   window.addEventListener('hashchange', route);
 
-  function renderPast() {
-    var list = $('past-list'), items = pastDiaries().map(function (d) {
-      var a = el('a', 'td-rowlink'); a.href = '#past-' + d.id;
-      var body = el('span', 'td-rowlink__body');
-      body.append(el('span', 'td-rowlink__title', 'Diary ' + d.number + ' · ' + rangeOf(d)),
-        el('span', 'td-rowlink__meta', 'Submitted ' + dayName(d.submittedOn) + ' · ' + live(d).length + ' activities'));
-      a.append(svg('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'), body, svg('<path d="M9 6l6 6-6 6"/>'));
-      var li = el('li'); li.append(a); return li;
-    });
-    list.replaceChildren.apply(list, items);
-    list.hidden = !items.length; $('past-empty').hidden = !!items.length; $('past-intro').hidden = !items.length;
-  }
 
   function updateMenu() {
     var c = currentDiary();
-    $('menu-current').textContent = isWaiting() ? 'starts ' + shortDate(nextStart()) : rangeOf(c);
-    $('menu-past').textContent = pastDiaries().length;
     document.querySelectorAll('#menu [data-view]').forEach(function (a) {
       var on = (a.dataset.view === view && (view !== 'timeline' || viewing === c)) || (a.dataset.view === 'timeline' && view === 'waiting');
-      if (a.dataset.view === 'past' && view === 'timeline' && viewing !== c) on = true;
       if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
   }

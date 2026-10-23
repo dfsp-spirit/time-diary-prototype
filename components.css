@@ -253,14 +253,6 @@ html:has(.td-modal[open] > form > .td-modal__foot:not([hidden])) .td-toast[popov
 .td-facts dd { margin: 0 0 var(--space-3); min-width: 0; }
 .td-facts dd.td-placeholder { padding: var(--space-2) var(--space-3); border-width: 1.5px; }
 
-/* ---------- Row links: a list of places, e.g. past diaries ---------- */
-.td-rowlinks { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
-.td-rowlink { display: flex; align-items: center; gap: var(--space-3); min-height: 72px; padding: var(--space-3) 0; border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none; }
-.td-rowlink:active { background: var(--surface-300); }
-.td-rowlink__body { flex: 1; min-width: 0; display: grid; gap: 2px; }
-.td-rowlink__title { font-weight: 600; font-size: 1rem; line-height: 1.375rem; }
-.td-rowlink__meta { font-size: 0.875rem; line-height: 1.25rem; color: var(--ink-muted); }
-.td-rowlink > .td-icon { color: var(--ink-muted); }
 
 /* ---------- Confirmation ---------- */
 .td-confirm { display: grid; justify-items: center; gap: var(--space-4); padding: var(--space-7) var(--space-4); text-align: center; }
@@ -278,7 +270,6 @@ html:has(.td-modal[open] > form > .td-modal__foot:not([hidden])) .td-toast[popov
 
 /* ---------- Hover: only on devices with a real pointer, so styles never stick after a tap ---------- */
 @media (hover: hover) and (pointer: fine) {
-  .td-rowlink:hover { background: var(--surface-100); }
   .td-btn--primary:hover { box-shadow: inset 0 0 0 2px var(--inverse-bg), inset 0 0 0 4px var(--inverse-ink); }
   .td-btn--secondary:hover, .td-btn--ghost:hover { background: var(--surface-100); }
   .td-btn[aria-disabled="true"]:hover { background: var(--surface-100); }

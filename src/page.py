@@ -264,7 +264,7 @@ page = f'''<!doctype html>
     </div>
     <div class="td-notice td-notice--readonly td-timeline__notice" id="readonly-note" role="note" hidden>
       <svg class="td-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-      <div class="td-notice__body"><p id="readonly-text"></p><p id="readonly-back" hidden><a href="#past">Back to past diaries</a></p></div>
+      <div class="td-notice__body"><p id="readonly-text"></p></div>
     </div>
     <div class="td-notice td-timeline__notice" id="storage-warning" role="status" hidden>
       <div class="td-notice__body"><p>This browser isn't letting the app save on this phone. Activities you add will be lost when you close it.</p></div>
@@ -352,16 +352,6 @@ page = f'''<!doctype html>
     <main class="td-confirm td-waiting">
       <h1 id="pt-waiting" tabindex="-1">Your next diary starts on <span id="wait-date"></span></h1>
       <p id="wait-days"></p>
-      <a class="td-btn td-btn--secondary" id="wait-sent" href="#past">See the diary you sent</a>
-    </main>
-  </section>
-
-  <section class="td-page" id="page-past" aria-labelledby="pt-past" hidden>
-    <header class="td-page__head"><a class="td-icon-btn" href="#timeline" aria-label="Back to your diary">{icon('prev')}</a><h1 id="pt-past" tabindex="-1">Past diaries</h1></header>
-    <main class="td-page__body">
-      <p class="td-hint" id="past-intro">Diaries you have submitted. You can look at them, but not change them.</p>
-      <ul class="td-rowlinks" id="past-list"></ul>
-      <p class="td-hint" id="past-empty" hidden>You haven't submitted a diary yet.</p>
     </main>
   </section>
 
@@ -392,7 +382,7 @@ page = f'''<!doctype html>
     <main class="td-page__body td-prose">
       <p>The activities you add are saved on this phone straight away, even without an internet connection.</p>
       <p>They stay on this phone until you submit your diary. When the research team confirms they received it, you see a thank-you screen with a reference.</p>
-      <p>After that, the diary is locked: you can look at it under Past diaries, but not change it.</p>
+      <p>After that, the diary is locked: you can look at it, but not change it.</p>
       <p class="td-placeholder">The research team's data protection statement goes here: who is responsible for the data, how it is stored and for how long, and your rights.</p>
     </main>
   </section>
@@ -432,8 +422,6 @@ page = f'''<!doctype html>
   </ul>
   <hr>
   <ul aria-label="Pages">
-    <li><a class="td-drawer__item" href="#timeline" data-view="timeline">Current diary <span class="td-drawer__meta" id="menu-current"></span></a></li>
-    <li><a class="td-drawer__item" href="#past" data-view="past">Past diaries <span class="td-drawer__meta" id="menu-past"></span></a></li>
     <li><a class="td-drawer__item" href="#study" data-view="study">Study information</a></li>
     <li><a class="td-drawer__item" href="#privacy" data-view="privacy">Data protection</a></li>
     <li><a class="td-drawer__item" href="#contact" data-view="contact">Contact</a></li>

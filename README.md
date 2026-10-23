@@ -41,7 +41,7 @@ Each test drives the app in a phone-sized browser and prints what it found as JS
 | Test | Checks |
 | --- | --- |
 | `resend.cjs` | Submitting offline locks the diary ("Waiting to send"). Back online, nothing sends by itself; Submit opens Review (no Edit links), the confirm step and Thank you |
-| `reload.cjs` | Refreshing on a day, opening a link to a day, opening a past diary |
+| `reload.cjs` | Refreshing on a day, opening a link to a day |
 | `daynav.cjs` | Previous / next day: one jump per tap, the heading lands under the top bar, Back isn't filled with days |
 | `semantic.cjs` | One `<main>` per view, headings, inert day arrow, toast placement and live region, error focus |
 | `lastday.cjs` | The diary's last day ends at midnight; copies that would cross it aren't added |

@@ -31,7 +31,6 @@ const { chromium } = require(process.env.PW || 'playwright');
   // a menu page: one main, toast at the bottom edge
   await p.evaluate(() => { location.hash = '#help'; }); await p.waitForTimeout(400);
   out.pageMains = await mains();
-  await p.evaluate(() => { location.hash = '#past'; }); await p.waitForTimeout(400); out.pastMains = await mains();
   // thanks dialog has no main
   out.mainInDialog = await p.evaluate(() => !!document.querySelector('dialog main'));
   out.inlineStyles = await p.evaluate(() => [...new Set([...document.querySelectorAll('[style]:not(li):not(html)')].map(e => e.tagName + '#' + e.id + '.' + e.className + ' ' + e.getAttribute('style').slice(0, 50)))]);

@@ -31,7 +31,7 @@ The thank-you screen after *Yes, submit*: the diary arrived, when the next one s
 
 ## After this
 
-The submitted diary moves to *Past diaries* in the menu, read-only, with the read-only notice at the top.
+The submitted diary becomes read-only, with the read-only notice at the top of the timeline.
 
 ## Waiting screen
 

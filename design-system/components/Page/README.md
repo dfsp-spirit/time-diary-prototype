@@ -1,6 +1,6 @@
 # Page
 
-A full screen reached from the menu: *Past diaries*, *How to add an activity*, *Study information*, *Data protection*, *Contact*.
+A full screen reached from the menu: *How to add an activity*, *Study information*, *Data protection*, *Contact*.
 
 ## Markup
 

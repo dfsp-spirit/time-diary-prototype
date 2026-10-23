@@ -340,14 +340,6 @@ html:has(.td-modal[open] > form > .td-modal__foot:not([hidden])) .td-toast[popov
 .td-facts dd { margin: 0 0 var(--space-3); min-width: 0; }
 .td-facts dd.td-placeholder { padding: var(--space-2) var(--space-3); border-width: 1.5px; }
 
-/* ---------- Row links: a list of places, e.g. past diaries ---------- */
-.td-rowlinks { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
-.td-rowlink { display: flex; align-items: center; gap: var(--space-3); min-height: 72px; padding: var(--space-3) 0; border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none; }
-.td-rowlink:active { background: var(--surface-300); }
-.td-rowlink__body { flex: 1; min-width: 0; display: grid; gap: 2px; }
-.td-rowlink__title { font-weight: 600; font-size: 1rem; line-height: 1.375rem; }
-.td-rowlink__meta { font-size: 0.875rem; line-height: 1.25rem; color: var(--ink-muted); }
-.td-rowlink > .td-icon { color: var(--ink-muted); }
 
 /* ---------- Confirmation ---------- */
 .td-confirm { display: grid; justify-items: center; gap: var(--space-4); padding: var(--space-7) var(--space-4); text-align: center; }
@@ -365,7 +357,6 @@ html:has(.td-modal[open] > form > .td-modal__foot:not([hidden])) .td-toast[popov
 
 /* ---------- Hover: only on devices with a real pointer, so styles never stick after a tap ---------- */
 @media (hover: hover) and (pointer: fine) {
-  .td-rowlink:hover { background: var(--surface-100); }
   .td-btn--primary:hover { box-shadow: inset 0 0 0 2px var(--inverse-bg), inset 0 0 0 4px var(--inverse-ink); }
   .td-btn--secondary:hover, .td-btn--ghost:hover { background: var(--surface-100); }
   .td-btn[aria-disabled="true"]:hover { background: var(--surface-100); }
@@ -491,7 +482,7 @@ html:has(.td-modal[open] > form > .td-modal__foot:not([hidden])) .td-toast[popov
     </div>
     <div class="td-notice td-notice--readonly td-timeline__notice" id="readonly-note" role="note" hidden>
       <svg class="td-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-      <div class="td-notice__body"><p id="readonly-text"></p><p id="readonly-back" hidden><a href="#past">Back to past diaries</a></p></div>
+      <div class="td-notice__body"><p id="readonly-text"></p></div>
     </div>
     <div class="td-notice td-timeline__notice" id="storage-warning" role="status" hidden>
       <div class="td-notice__body"><p>This browser isn't letting the app save on this phone. Activities you add will be lost when you close it.</p></div>
@@ -579,16 +570,6 @@ html:has(.td-modal[open] > form > .td-modal__foot:not([hidden])) .td-toast[popov
     <main class="td-confirm td-waiting">
       <h1 id="pt-waiting" tabindex="-1">Your next diary starts on <span id="wait-date"></span></h1>
       <p id="wait-days"></p>
-      <a class="td-btn td-btn--secondary" id="wait-sent" href="#past">See the diary you sent</a>
-    </main>
-  </section>
-
-  <section class="td-page" id="page-past" aria-labelledby="pt-past" hidden>
-    <header class="td-page__head"><a class="td-icon-btn" href="#timeline" aria-label="Back to your diary"><svg class="td-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></a><h1 id="pt-past" tabindex="-1">Past diaries</h1></header>
-    <main class="td-page__body">
-      <p class="td-hint" id="past-intro">Diaries you have submitted. You can look at them, but not change them.</p>
-      <ul class="td-rowlinks" id="past-list"></ul>
-      <p class="td-hint" id="past-empty" hidden>You haven't submitted a diary yet.</p>
     </main>
   </section>
 
@@ -619,7 +600,7 @@ html:has(.td-modal[open] > form > .td-modal__foot:not([hidden])) .td-toast[popov
     <main class="td-page__body td-prose">
       <p>The activities you add are saved on this phone straight away, even without an internet connection.</p>
       <p>They stay on this phone until you submit your diary. When the research team confirms they received it, you see a thank-you screen with a reference.</p>
-      <p>After that, the diary is locked: you can look at it under Past diaries, but not change it.</p>
+      <p>After that, the diary is locked: you can look at it, but not change it.</p>
       <p class="td-placeholder">The research team's data protection statement goes here: who is responsible for the data, how it is stored and for how long, and your rights.</p>
     </main>
   </section>
@@ -659,8 +640,6 @@ html:has(.td-modal[open] > form > .td-modal__foot:not([hidden])) .td-toast[popov
   </ul>
   <hr>
   <ul aria-label="Pages">
-    <li><a class="td-drawer__item" href="#timeline" data-view="timeline">Current diary <span class="td-drawer__meta" id="menu-current"></span></a></li>
-    <li><a class="td-drawer__item" href="#past" data-view="past">Past diaries <span class="td-drawer__meta" id="menu-past"></span></a></li>
     <li><a class="td-drawer__item" href="#study" data-view="study">Study information</a></li>
     <li><a class="td-drawer__item" href="#privacy" data-view="privacy">Data protection</a></li>
     <li><a class="td-drawer__item" href="#contact" data-view="contact">Contact</a></li>
@@ -717,7 +696,7 @@ html:has(.td-modal[open] > form > .td-modal__foot:not([hidden])) .td-toast[popov
 </div>
 
 <script>
-/* Time Diary prototype — diaries, timeline, Add / Edit activity, submit, past diaries and pages.
+/* Time Diary prototype — diary, timeline, Add / Edit activity, submit and pages.
    Saved on the phone with IndexedDB. Rule: store first, confirm second. */
 (function () {
   'use strict';
@@ -815,14 +794,13 @@ html:has(.td-modal[open] > form > .td-modal__foot:not([hidden])) .td-toast[popov
   var entries = [];        // every activity record, removed ones included (so Undo always works)
   var today = FIRST_TODAY; // prototype clock
   var viewing = null;      // the diary shown on the timeline
-  var view = 'timeline';   // timeline | past | help | study | privacy | contact
+  var view = 'timeline';   // timeline | help | study | privacy | contact
 
   var live = function (d) { return entries.filter(function (e) { return !e.removedAt && (!d || e.diaryId === d.id); }); };
   var byId = function (id) { return entries.find(function (e) { return e.id === id; }); };
   var sorted = function () { return diaries.slice().sort(function (a, b) { return a.number - b.number; }); };
   var currentDiary = function () { var c = null; sorted().forEach(function (d) { if (d.start <= today) c = d; }); return c || sorted()[0]; };
   var nextStart = function () { var c = currentDiary(); return addDays(c.start, c.days); };
-  var pastDiaries = function () { return sorted().filter(function (d) { return d.status === 'submitted'; }).reverse(); };
   /* sent and received, and the next diary hasn't started yet */
   var isWaiting = function () { var c = currentDiary(); return c.status === 'submitted' && nextStart() > today; };
   var readOnly = function () { return !!viewing && (viewing.status === 'submitted' || viewing.status === 'pending'); };  /* pending = locked, waiting to send */
@@ -986,10 +964,8 @@ html:has(.td-modal[open] > form > .td-modal__foot:not([hidden])) .td-toast[popov
     if (d.status === 'pending') {
       if (online()) txt.append(el('strong', null, 'Ready to send.'), ' You\u2019re back online. Tap Submit to check and send your diary.');
       else txt.append(el('strong', null, 'Waiting to send.'), ' Your diary is locked and safe on this phone. When you\u2019re back online, tap Submit to send it.');
-      $('readonly-back').hidden = true;
     } else {
       txt.append(el('strong', null, 'Diary ' + d.number + ' \u00b7 Submitted on ' + dayName(d.submittedOn) + '.'), ' You can look, but not change it.');
-      $('readonly-back').hidden = false;
     }
   }
 
@@ -1060,9 +1036,9 @@ html:has(.td-modal[open] > form > .td-modal__foot:not([hidden])) .td-toast[popov
   }
 
   /* ======================================================================
-     Views: timeline (current or a past diary) and the menu's pages
+     Views: the timeline and the menu's pages
      ====================================================================== */
-  var PAGES = ['waiting', 'past', 'help', 'study', 'privacy', 'contact'];
+  var PAGES = ['waiting', 'help', 'study', 'privacy', 'contact'];
   /* Home is the current diary, or the waiting screen between diaries */
   function home() { return isWaiting() ? show('waiting') : show('timeline', currentDiary()); }
   function show(name, diary) {
@@ -1079,7 +1055,6 @@ html:has(.td-modal[open] > form > .td-modal__foot:not([hidden])) .td-toast[popov
       if (!wasTimeline || viewing !== prevDiary || readOnly()) { setBar(); if (!location.hash.startsWith('#day-')) { if (readOnly() || !live(viewing).length) window.scrollTo(0, 0); else scrollToToday(); } }
       updateDayNav();
     } else {
-      if (name === 'past') renderPast();
       if (name === 'waiting') renderWaiting();
       window.scrollTo(0, 0);
       $('pt-' + name).focus({ preventScroll: true });
@@ -1092,8 +1067,6 @@ html:has(.td-modal[open] > form > .td-modal__foot:not([hidden])) .td-toast[popov
     var h = location.hash.slice(1);
     if (h === 'waiting') return home();
     if (PAGES.indexOf(h) >= 0) return show(h);
-    var m = /^past-(d\d+)$/.exec(h);
-    if (m) { var d = diaries.find(function (x) { return x.id === m[1]; }); if (d) return show('timeline', d); }
     if (h.indexOf('day-') === 0) {
       if (!dayEls.length && isWaiting()) return home();
       if (view !== 'timeline' || !dayEls.length) show('timeline', viewing || currentDiary());   /* first load or a refresh on a day */
@@ -1108,30 +1081,14 @@ html:has(.td-modal[open] > form > .td-modal__foot:not([hidden])) .td-toast[popov
     var c = currentDiary(), n = daysBetween(today, nextStart());
     $('wait-date').textContent = dayName(nextStart());
     $('wait-days').textContent = n === 1 ? 'Tomorrow' : 'In ' + n + ' days';
-    $('wait-sent').href = '#past-' + c.id;
   }
   window.addEventListener('hashchange', route);
 
-  function renderPast() {
-    var list = $('past-list'), items = pastDiaries().map(function (d) {
-      var a = el('a', 'td-rowlink'); a.href = '#past-' + d.id;
-      var body = el('span', 'td-rowlink__body');
-      body.append(el('span', 'td-rowlink__title', 'Diary ' + d.number + ' · ' + rangeOf(d)),
-        el('span', 'td-rowlink__meta', 'Submitted ' + dayName(d.submittedOn) + ' · ' + live(d).length + ' activities'));
-      a.append(svg('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'), body, svg('<path d="M9 6l6 6-6 6"/>'));
-      var li = el('li'); li.append(a); return li;
-    });
-    list.replaceChildren.apply(list, items);
-    list.hidden = !items.length; $('past-empty').hidden = !!items.length; $('past-intro').hidden = !items.length;
-  }
 
   function updateMenu() {
     var c = currentDiary();
-    $('menu-current').textContent = isWaiting() ? 'starts ' + shortDate(nextStart()) : rangeOf(c);
-    $('menu-past').textContent = pastDiaries().length;
     document.querySelectorAll('#menu [data-view]').forEach(function (a) {
       var on = (a.dataset.view === view && (view !== 'timeline' || viewing === c)) || (a.dataset.view === 'timeline' && view === 'waiting');
-      if (a.dataset.view === 'past' && view === 'timeline' && viewing !== c) on = true;
       if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
   }
