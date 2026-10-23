@@ -635,7 +635,6 @@ html:has(.td-modal[open] > form > .td-modal__foot:not([hidden])) .td-toast[popov
     <button class="td-icon-btn" type="button" popovertarget="menu" popovertargetaction="hide" aria-label="Close menu"><svg class="td-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
   <ul aria-label="Actions">
-    <li><a class="td-drawer__item" href="#today" id="go-today">Go to today</a></li>
     <li><a class="td-drawer__item" href="#help" data-view="help">How to add an activity</a></li>
   </ul>
   <hr>
@@ -1449,13 +1448,8 @@ html:has(.td-modal[open] > form > .td-modal__foot:not([hidden])) .td-toast[popov
   function hideToast() { if (t.contains(document.activeElement)) { toastTimer = setTimeout(hideToast, 2000); return; } if (t.matches(':popover-open')) t.hidePopover(); }
   $('toast-undo').addEventListener('click', function () { var f = undoFn; undoFn = null; hideToast(); if (f) f(); });
 
-  /* ---------- Menu: links close it; "Go to today" ---------- */
+  /* ---------- Menu: links close it ---------- */
   document.querySelectorAll('[popover] a[href^="#"]').forEach(function (a) { a.addEventListener('click', function () { a.closest('[popover]').hidePopover(); }); });
-  $('go-today').addEventListener('click', function (ev) {
-    ev.preventDefault();
-    try { if (location.hash !== '#timeline') history.pushState(null, '', '#timeline'); } catch (err) {}
-    home(); if (view === 'timeline') scrollToToday();
-  });
 
   /* ---------- Prototype only ---------- */
   $('fill-days').addEventListener('click', function () {

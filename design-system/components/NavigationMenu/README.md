@@ -21,7 +21,6 @@ The menu behind the ☰ button in the TopBar: a panel from the left with actions
 ## Contents
 
 **Actions** (do something on the current screen):
-- *Go to today*: link to today's anchor on the timeline.
 - *How to add an activity*: link to a short help page.
 
 **Pages** (go somewhere else):

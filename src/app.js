@@ -751,13 +751,8 @@
   function hideToast() { if (t.contains(document.activeElement)) { toastTimer = setTimeout(hideToast, 2000); return; } if (t.matches(':popover-open')) t.hidePopover(); }
   $('toast-undo').addEventListener('click', function () { var f = undoFn; undoFn = null; hideToast(); if (f) f(); });
 
-  /* ---------- Menu: links close it; "Go to today" ---------- */
+  /* ---------- Menu: links close it ---------- */
   document.querySelectorAll('[popover] a[href^="#"]').forEach(function (a) { a.addEventListener('click', function () { a.closest('[popover]').hidePopover(); }); });
-  $('go-today').addEventListener('click', function (ev) {
-    ev.preventDefault();
-    try { if (location.hash !== '#timeline') history.pushState(null, '', '#timeline'); } catch (err) {}
-    home(); if (view === 'timeline') scrollToToday();
-  });
 
   /* ---------- Prototype only ---------- */
   $('fill-days').addEventListener('click', function () {

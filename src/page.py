@@ -417,7 +417,6 @@ page = f'''<!doctype html>
     <button class="td-icon-btn" type="button" popovertarget="menu" popovertargetaction="hide" aria-label="Close menu">{icon('close')}</button>
   </div>
   <ul aria-label="Actions">
-    <li><a class="td-drawer__item" href="#today" id="go-today">Go to today</a></li>
     <li><a class="td-drawer__item" href="#help" data-view="help">How to add an activity</a></li>
   </ul>
   <hr>

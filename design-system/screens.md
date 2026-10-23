@@ -34,4 +34,4 @@ If a slot would hold a fourth overlapping activity, *Add to timeline* explains t
 
 ## Menu (drawer)
 
-Actions above the divider: *Go to today*, *How to add an activity*. Links below it: *Study information*, *Data protection*, *Contact*.
+Actions above the divider: *How to add an activity*. Links below it: *Study information*, *Data protection*, *Contact*.
